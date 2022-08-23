@@ -1,0 +1,68 @@
+name: docs-preview
+
+on:
+  pull-request:
+    types: [labeled, unlabeled, opened, synchronize, reopened]
+
+jobs:
+  docs:
+    runs-on: ubuntu-latest
+    env:
+      RTD_AUTH_TOKEN: ${{ secrets.RTD_AUTH_TOKEN }}
+      RTD_PROJ_URL: https://readthedocs.org/api/v3/projects
+      PROJ_SLUG: sorna
+      VER_SLUG: ${{ github.ref_name }}
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 2
+
+      - name: Setup python
+        uses: actions/setup-python@v3
+        with:
+          python-version: "3.8"
+
+      - name: Activate Branch
+        run: |
+          RESP_CODE=$(curl \
+            -X PATCH \
+            -H "Authorization: Token RTD_AUTH_TOKEN" $RTD_PROJ_URL/$PROJ_SLUG/versions/$VER_SLUG/ \
+            -H "Content-Type: application/json"
+            -d '{"active": true, "hidden": false}' -o /dev/null -w '%{http_code}\n' -s
+          )
+          if [ $RESP_CODE -eq 204 ]
+          then
+            echo "Automatically activate $VER_SLUG version of $PROJ_SLUG"
+          else
+            exit 1
+          fi
+
+      - name: Trigger a New Build
+        working-directory: docs
+        run: |
+          RESP_CODE=$(curl \
+            -X PATCH \
+            -H "Authorization: Token RTD_AUTH_TOKEN" $RTD_PROJ_URL/$PROJ_SLUG/versions/$VER_SLUG/builds/ \
+            -o /dev/null -w '%{http_code}\n' -s
+          )
+          if [ $RESP_CODE -eq 202 ]
+          then
+            echo "Build triggering success: $VER_SLUG version of $PROJ_SLUG"
+          else
+            exit 1
+          fi
+
+      - name: Deactivate Branch
+        run: |
+          RESP_CODE=$(curl \
+            -X PATCH \
+            -H "Authorization: Token RTD_AUTH_TOKEN" $RTD_PROJ_URL/$PROJ_SLUG/versions/$VER_SLUG/ \
+            -H "Content-Type: application/json"
+            -d '{"active": false, "hidden": false}' -o /dev/null -w '%{http_code}\n' -s
+          )
+          if [ $RESP_CODE -eq 204 ]
+          then
+            echo "Automatically deactivate $VER_SLUG version of $PROJ_SLUG"
+          else
+            exit 1
+          fi
