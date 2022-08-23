@@ -1,8 +1,6 @@
 name: docs-preview
 
-on:
-  pull-request:
-    types: [labeled, unlabeled, opened, synchronize, reopened]
+on: [pull-request]
 
 jobs:
   docs:
