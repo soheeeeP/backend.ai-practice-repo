@@ -25,7 +25,7 @@ jobs:
           RESP_CODE=$(curl \
             -X PATCH \
             -H "Authorization: Token RTD_AUTH_TOKEN" $RTD_PROJ_URL/$PROJ_SLUG/versions/$VER_SLUG/ \
-            -H "Content-Type: application/json"
+            -H "Content-Type: application/json" \
             -d '{"active": true, "hidden": false}' -o /dev/null -w '%{http_code}\n' -s
           )
           if [ $RESP_CODE -eq 204 ]
@@ -55,7 +55,7 @@ jobs:
           RESP_CODE=$(curl \
             -X PATCH \
             -H "Authorization: Token RTD_AUTH_TOKEN" $RTD_PROJ_URL/$PROJ_SLUG/versions/$VER_SLUG/ \
-            -H "Content-Type: application/json"
+            -H "Content-Type: application/json" \
             -d '{"active": false, "hidden": false}' -o /dev/null -w '%{http_code}\n' -s
           )
           if [ $RESP_CODE -eq 204 ]
