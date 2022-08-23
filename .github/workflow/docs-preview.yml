@@ -1,6 +1,6 @@
 name: docs-preview
 
-on: [pull-request]
+on: [pull_request]
 
 jobs:
   docs:
