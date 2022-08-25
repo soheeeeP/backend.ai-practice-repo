@@ -6,7 +6,7 @@ on:
 
 jobs:
   action:
-    if: ${{ github.event.pull_request.labels.*.name == 'docs' }}
+    if: ${{ contains(github.event.pull_request.labels.*.name, 'docs') }}
     runs-on: ubuntu-latest
     steps:
       - run: |
