@@ -1,0 +1,69 @@
+name: docs-preview
+
+on: [pull_request]
+
+jobs:
+  docs:
+    runs-on: ubuntu-latest
+    env:
+      RTD_AUTH_TOKEN: ${{ secrets.RTD_AUTH_TOKEN }}
+      RTD_PROJ_URL: https://readthedocs.org/api/v3/projects
+      PROJ_SLUG: sphinx-template-docs
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 50
+      - name: Setup python
+        uses: actions/setup-python@v3
+        with:
+          python-version: "3.8"
+      - name: Get branch name
+        id: branch-name
+        uses: tj-actions/branch-names@v5.5
+      - name: Update working project
+        run: |
+          RESP_CODE=$(curl \
+            -X PATCH \
+            -H "Authorization: Token $RTD_AUTH_TOKEN" $RTD_PROJ_URL/$PROJ_SLUG/ \
+            -H "Content-Type: application/json" \
+            -d '{"repository": {"url": "${{ github.server_url }}/${{ github.repository }}.git", "type": "git"}}' \
+            -o /dev/null -w '%{http_code}\n' -s
+          )
+          if [ $RESP_CODE -ne 204 ]; then exit 1; fi
+          echo "Successfully update $PROJ_SLUG"
+      - name: Activate Branch
+        env:
+          VER_SLUG: ${{ steps.branch-name.outputs.current_branch }}
+        run: |
+          RESP_CODE=$(curl \
+            -X PATCH \
+            -H "Authorization: Token $RTD_AUTH_TOKEN" $RTD_PROJ_URL/$PROJ_SLUG/versions/$VER_SLUG/ \
+            -H "Content-Type: application/json" \
+            -d '{"active": true, "hidden": false}' -o /dev/null -w '%{http_code}\n' -s
+          )
+          if [ $RESP_CODE -ne 204 ]; then exit 1; fi
+          echo "Automatically activate $VER_SLUG version of $PROJ_SLUG"
+      - name: Trigger a New Build
+        working-directory: .
+        env:
+          VER_SLUG: ${{ steps.branch-name.outputs.current_branch }}
+        run: |
+          RESP_CODE=$(curl \
+            -X POST \
+            -H "Authorization: Token $RTD_AUTH_TOKEN" $RTD_PROJ_URL/$PROJ_SLUG/versions/$VER_SLUG/builds/ \
+            -o /dev/null -w '%{http_code}\n' -s
+          )
+          if [ $RESP_CODE -ne 202 ]; then exit 1; fi
+          echo "Successfully trigger new $VER_SLUG build of $PROJ_SLUG"
+      - name: Deactivate Branch
+        env:
+          VER_SLUG: ${{ steps.branch-name.outputs.current_branch }}
+        run: |
+          RESP_CODE=$(curl \
+            -X PATCH \
+            -H "Authorization: Token $RTD_AUTH_TOKEN" $RTD_PROJ_URL/$PROJ_SLUG/versions/$VER_SLUG/ \
+            -H "Content-Type: application/json" \
+            -d '{"active": false, "hidden": false}' -o /dev/null -w '%{http_code}\n' -s
+          )
+          if [ $RESP_CODE -ne 204 ]; then exit 1; fi
+          echo "Automatically deactivate $VER_SLUG version of $PROJ_SLUG"
