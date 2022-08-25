@@ -23,7 +23,7 @@ jobs:
         uses: tj-actions/branch-names@v5.5
       - name: Update working project
         env:
-          REPOSITORY_URL: https://github.com/${{ github.repository }}.git
+          REPOSITORY_URL: https://github.com/${GITHUB_REPOSITORY}.git
         run: |
           RESP_CODE=$(curl \
             -X PATCH \
