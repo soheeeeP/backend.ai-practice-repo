@@ -22,6 +22,21 @@ jobs:
       - name: Get branch name
         id: branch-name
         uses: tj-actions/branch-names@v5.5
+      - name: Update working project
+        run: |
+          RESP_CODE=$(curl \
+            -X PATCH \
+            -H "Authorization: Token $RTD_AUTH_TOKEN" $RTD_PROJ_URL/$PROJ_SLUG/ \
+            -H "Content-Type: application/json" \
+            -d '{"repository": {"url": ${{ github.repository }}, "type": "git"}}' \
+            -o /dev/null -w '%{http_code}\n' -s
+          )
+          if [ $RESP_CODE -eq 204 ]
+          then
+            echo "Successfully update $PROJ_SLUG"
+          else
+            exit 1
+          fi
 
       - name: Activate Branch
         env:
