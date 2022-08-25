@@ -8,7 +8,7 @@ jobs:
     env:
       RTD_AUTH_TOKEN: ${{ secrets.RTD_AUTH_TOKEN }}
       RTD_PROJ_URL: https://readthedocs.org/api/v3/projects
-      PROJ_SLUG: sorna
+      PROJ_SLUG: sphinx-template-docs
     steps:
       - uses: actions/checkout@v3
         with:
