@@ -11,9 +11,6 @@ jobs:
       PROJ_SLUG: sphinx-template-docs
     steps:
       - uses: actions/checkout@v3
-        with:
-          fetch-depth: 2
-
       - name: Setup python
         uses: actions/setup-python@v3
         with:
