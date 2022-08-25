@@ -20,11 +20,11 @@ msgstr ""
 
 #: ../../index.rst:9
 msgid "Contents:"
-msgstr ""
+msgstr "목차"
 
 #: ../../index.rst:7
 msgid "Fix: Welcome to Sphinx Template's documentation!"
-msgstr ""
+msgstr "수정: Sphinx Template 문서에 오신 것을 환영합니다."
 
 #: ../../index.rst:16
 msgid "Indices and tables"
