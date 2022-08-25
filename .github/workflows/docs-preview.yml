@@ -66,7 +66,7 @@ jobs:
           VER_SLUG: ${{ steps.branch-name.outputs.current_branch }}
         run: |
           RESP_CODE=$(curl \
-            -X PATCH \
+            -X POST \
             -H "Authorization: Token $RTD_AUTH_TOKEN" $RTD_PROJ_URL/$PROJ_SLUG/versions/$VER_SLUG/builds/ \
             -o /dev/null -w '%{http_code}\n' -s
           )
