@@ -44,6 +44,7 @@ jobs:
           if [ $RESP_CODE -ne 204 ]; then exit 1; fi
           echo "Automatically activate $VER_SLUG version of $PROJ_SLUG"
       - name: Trigger a New Build
+        working-directory: .
         env:
           VER_SLUG: ${{ steps.branch-name.outputs.current_branch }}
         run: |
