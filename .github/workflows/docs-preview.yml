@@ -43,7 +43,6 @@ jobs:
           fi
 
       - name: Trigger a New Build
-        working-directory: docs
         env:
           VER_SLUG: ${{ steps.branch-name.outputs.current_branch }}
         run: |
