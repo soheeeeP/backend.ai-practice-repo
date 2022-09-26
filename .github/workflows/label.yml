@@ -10,7 +10,7 @@ jobs:
     steps:
     - name: Check PR labels
       env:
-        PR_LABELS: ${{ github.event.pull_request.labels.*.name }}
+        PR_LABELS: ${{ toJson(github.event.pull_request.labels.*.name) }}
       run: echo $PR_LABELS
     - name: Set up Python
       uses: actions/setup-python@v3
