@@ -22,7 +22,7 @@ jobs:
     - name: Install Dependencies
       run: |
         python -m pip install -U pip setuptools
-        python -m pip install -U towncrier~=21.9
+        python -m pip install -U towncrier
     - name: Check existence of news fragment
       env:
         BASE_BRANCH: ${{ github.base_ref }}
