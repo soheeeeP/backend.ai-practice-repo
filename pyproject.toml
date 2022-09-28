@@ -1,13 +1,14 @@
 [tool.towncrier]
-package = "sphinx_template"  # reference point for getting __version__
+version = "22.09.0"  # reference point for getting __version__
 filename = "CHANGELOG.md"
 directory = "changes/"
-title_format = "## {version} ({project_date})"
+title_format = "## {version} ({project_date})"  ## ## 22.09.0 (2022-09-28)
 template = "changes/template.md"
 start_string = "<!-- towncrier release notes start -->\n"
 issue_format = "([#{issue}](https://github.com/lablup/sphinx-template/issues/{issue}))"
 underlines = ["", "", ""]
 
+## Custom fragment types for towncrier draft rendering
 [[tool.towncrier.type]]
     directory = "breaking"
     name = "Breaking Changes"
