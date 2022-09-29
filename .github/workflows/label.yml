@@ -2,11 +2,13 @@ name: label
 
 on: 
   pull_request:
-    types: [labeled, opened, synchronize, reopened]
+    types: [labeled, opened, edited, reopened]
 
 jobs:
   build:
     runs-on: ubuntu-latest
+    env:
+      BASE_BRANCH: ${{ github.base_ref }}
     steps:
     - name: Sparse-checkout
       uses: lablup/sparse-checkout@v1
@@ -34,5 +36,21 @@ jobs:
       run: |
         git fetch --no-tags origin +refs/heads/${BASE_BRANCH}:refs/remotes/origin/${BASE_BRANCH} &&
         python -m towncrier.check
+    - name: Check news fragment related to PR label
       env:
-        BASE_BRANCH: ${{ github.base_ref }}
+        PR_LABELS: ${{ toJson(github.event.pull_request.labels.*.name) }}
+        PR_NAME: ${{ github.event.pull_request.title }}
+      run: |
+        python ${BASE_BRANCH}/towncrier_shell.py --content "$PR_NAME" --fragments "$PR_LABELS"
+    - name: Auto Commit and Push
+      id: auto-commit-action
+      uses: stefanzweifel/git-auto-commit-action@v4
+      with:
+        commit_message: update news fragment
+    - name: Change Detection
+      run: |
+        if {{ steps.auto-commit-action.outputs.changes_detected == 'true'}}; then
+          echo "change detected"
+        else
+          echo "no changes"
+        fi
