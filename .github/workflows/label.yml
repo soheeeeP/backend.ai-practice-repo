@@ -40,8 +40,9 @@ jobs:
       env:
         PR_LABELS: ${{ toJson(github.event.pull_request.labels.*.name) }}
         PR_NAME: ${{ github.event.pull_request.title }}
+      working-directory: .
       run: |
-        python ${BASE_BRANCH}/towncrier_shell.py --content "$PR_NAME" --fragments "$PR_LABELS"
+        python towncrier_shell.py --content "$PR_NAME" --fragments "$PR_LABELS"
     - name: Auto Commit and Push
       id: auto-commit-action
       uses: stefanzweifel/git-auto-commit-action@v4
