@@ -49,8 +49,11 @@ jobs:
       with:
         commit_message: update news fragment
     - name: Change Detection
+      env:
+        OUTPUT: ${{ steps.auto-commit-action.outputs.changes_detected }}
       run: |
-        if {{ steps.auto-commit-action.outputs.changes_detected == 'true'}}; then
+        echo $OUTPUT
+        if $OUTPUT; then
           echo "change detected"
         else
           echo "no changes"
