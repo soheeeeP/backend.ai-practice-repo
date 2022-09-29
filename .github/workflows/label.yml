@@ -9,6 +9,8 @@ jobs:
     runs-on: ubuntu-latest
     env:
       BASE_BRANCH: ${{ github.base_ref }}
+      PR_LABELS: ${{ toJson(github.event.pull_request.labels.*.name) }}
+      PR_NAME: ${{ github.event.pull_request.title }}
     steps:
     - name: Sparse-checkout
       uses: lablup/sparse-checkout@v1
@@ -22,26 +24,24 @@ jobs:
       with:
         python-version: "3.10"
         check-latest: true
-    - name: Check PR labels
-      env:
-        PR_LABELS: ${{ toJson(github.event.pull_request.labels.*.name) }}
-        PR_NAME: ${{ github.event.pull_request.title }}
-      run: |
-        echo $PR_LABELS $PR_NAME
+    - name: Get current branch name
+      id: branch-name
+      uses: tj-actions/branch-names@v5.5
     - name: Install dependencies
       run: |
         python -m pip install -U pip setuptools
         python -m pip install -U towncrier~=21.9
-    - name: Check existence of news fragment
+    - name: Check existence of the news fragment
       run: |
-        git fetch --no-tags origin +refs/heads/${BASE_BRANCH}:refs/remotes/origin/${BASE_BRANCH} &&
+        git fetch --no-tags origin +refs/heads/${BASE_BRANCH}:refs/remotes/origin/${BASE_BRANCH}
         python -m towncrier.check
-    - name: Check news fragment related to PR label
+    - name: Update news fragment
       env:
-        PR_LABELS: ${{ toJson(github.event.pull_request.labels.*.name) }}
-        PR_NAME: ${{ github.event.pull_request.title }}
+        CURRENT_BRANCH: ${{ steps.branch-name.outputs.current_branch }}
       working-directory: .
       run: |
+        git fetch --no-tags origin +refs/heads/${CURRENT_BRANCH}:refs/remotes/origin/${CURRENT_BRANCH}
+        git merge refs/remotes/origin/${CURRENT_BRANCH}
         python towncrier_shell.py --content "$PR_NAME" --fragments "$PR_LABELS"
     - name: Auto Commit and Push
       id: auto-commit-action
