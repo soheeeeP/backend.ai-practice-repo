@@ -7,18 +7,16 @@ on:
 jobs:
   check:
     runs-on: ubuntu-latest
+    env:
+      pr_labels: ${{ toJson(github.event.pull_request.labels) }}
+      pr_labels_name: ${{ toJson(github.event.pull_request.labels.*.name) != [] }}
     steps:
       - uses: actions/checkout@v3
         with:
           fetch-depth: 50
       - name: Check Issue & PR Number
-        env:
-          pr_labels: ${{ toJson(github.event.pull_request.labels) }}
-          pr_labels_name: ${{ toJson(github.event.pull_request.labels.*.name) }}
         run: |
-          var = join(github.event.issue.labels) 
-          echo $var
-          echo $pr_labels $pr_labels_name
+          echo $pr_labels_name
           echo ${{ github.event.number }}
           echo ${{ github.event.pull_request.number }}
           echo ${{ github.event.issue.number }}
