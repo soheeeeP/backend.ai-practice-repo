@@ -13,7 +13,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       BASE_BRANCH: ${{ github.base_ref }}
-      PR_LABELS: ${{ matrix.labels }}
+      PR_LABEL: ${{ matrix.labels }}
       PR_NAME: ${{ github.event.pull_request.title }}
     steps:
     - name: Sparse-checkout
@@ -50,10 +50,10 @@ jobs:
         CURRENT_BRANCH: ${{ steps.branch-name.outputs.current_branch }}
       working-directory: .
       run: |
-        echo $PR_NAME $PR_LABELS
+        echo $PR_NAME $PR_LABEL
         git fetch --no-tags origin +refs/heads/${CURRENT_BRANCH}:refs/remotes/origin/${CURRENT_BRANCH}
         git merge refs/remotes/origin/${CURRENT_BRANCH}
-        python towncrier_shell.py --content "$PR_NAME" --fragments "$PR_LABELS"
+        python towncrier_shell.py --content "$PR_NAME" --fragments "$PR_LABEL"
 
     - name: Get changed files
       id: changed-files
@@ -68,7 +68,7 @@ jobs:
       if: ${{ steps.changed-files.outputs.any_changed }}
       uses: stefanzweifel/git-auto-commit-action@v4
       with:
-        commit_message: update news fragment
+        commit_message: update $PR_LABEL news fragment
     - name: Change Detection
       env:
         OUTPUT: ${{ steps.auto-commit-action.outputs.changes_detected }}
