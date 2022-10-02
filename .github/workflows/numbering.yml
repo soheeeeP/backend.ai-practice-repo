@@ -9,7 +9,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       pr_labels: ${{ toJson(github.event.pull_request.labels) }}
-      pr_labels_name: ${{ toJson(github.event.pull_request.labels.*.name) != [] }}
+      pr_labels_name: ${{ toJson(github.event.pull_request.labels.*.name) }} != []
     steps:
       - uses: actions/checkout@v3
         with:
