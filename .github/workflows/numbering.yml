@@ -1,0 +1,28 @@
+name: numbering
+
+on:
+  pull_request:
+    types: [opened, synchronize, labeled, unlabeled]
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    if: |
+      toJson(github.event.pull_request.labels.*.name) != '[]'
+        && toJson(github.event.pull_request.labels.*.name) != ''
+    # if: ${{ toJson(github.event.pull_request.labels.*.name) != '[]' && toJson(github.event.pull_request.labels.*.name) != '' }}
+    strategy:
+      matrix:
+        labels: ${{ github.event.pull_request.labels.*.name }}
+    env:
+      pr_labels_name: ${{ matrix.labels }}
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 50
+      - name: Check Issue & PR Number
+        run: |
+          echo $pr_labels_name
+          echo ${{ github.event.number }}
+          echo ${{ github.event.pull_request.number }}
+          echo ${{ github.event.issue.number }}
