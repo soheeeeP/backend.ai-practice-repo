@@ -10,6 +10,7 @@ jobs:
     strategy:
       matrix:
         labels: ${{ github.event.pull_request.labels.*.name }}
+    if: ${{ matrix.labels != "" }}
     env:
       pr_labels_name: ${{ matrix.labels }}
     steps:
