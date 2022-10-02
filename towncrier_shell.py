@@ -13,6 +13,7 @@ def arg_as_list(s):
         raise argparse.ArgumentTypeError('Argument (%s) is not a list.', (s))
     return v
 
+
 def get_config():
     directory = os.path.abspath("./")
     config_path = Path(os.path.join(directory, "pyproject.toml"))
@@ -30,7 +31,7 @@ def main():
         help='Enter the contents for the news fragment to modify.'
     )
     parser.add_argument(
-        '--fragments', type=arg_as_list, default=[],
+        '--fragments', type=str, default='',
         help='Enter the list of fragment types for the new fragment you want to modify.'
     )
 
@@ -50,7 +51,7 @@ def main():
         raise Exception()
     for basename in files:
         parts = basename.split(".")
-        if len(parts) != 3 or parts[1] not in args.fragments:
+        if len(parts) != 3 or parts[1] != args.fragments:
             continue
         output_path = Path(os.path.join(fragment_dir, basename))
         output_path.write_text(args.content)
