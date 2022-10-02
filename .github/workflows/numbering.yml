@@ -7,10 +7,10 @@ on:
 jobs:
   check:
     runs-on: ubuntu-latest
+    if: ${{ toJson(github.event.pull_request.labels.*.name) != '[]' && toJson(github.event.pull_request.labels.*.name) != '' }}
     strategy:
       matrix:
         labels: ${{ github.event.pull_request.labels.*.name }}
-    if: ${{ matrix.labels != "" }}
     env:
       pr_labels_name: ${{ matrix.labels }}
     steps:
