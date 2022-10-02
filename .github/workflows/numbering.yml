@@ -13,7 +13,10 @@ jobs:
           fetch-depth: 50
       - name: Check Issue & PR Number
         run: |
+          echo ${{ github.event.pull_request.labels }}
           echo ${{ github.event.pull_request.labels.*.name }}
+          echo ${{ toJson(github.event.pull_request.labels) }}
+          echo ${{ toJson(github.event.pull_request.labels.*.name) }}
           echo ${{ github.event.number }}
           echo ${{ github.event.pull_request.number }}
           echo ${{ github.event.issue.number }}
