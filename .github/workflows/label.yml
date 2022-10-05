@@ -55,11 +55,11 @@ jobs:
         PR_NUMBER: ${{ github.event.pull_request.number }}
         PR_TITLE: ${{ steps.get-label.outputs.pr_title }}
         FRAGMENT: ${{ steps.get-label.outputs.fragment }}
-      working-directory: scripts/
+      working-directory: .
       run: |
         git fetch --no-tags origin +refs/heads/${CURRENT_BRANCH}:refs/remotes/origin/${CURRENT_BRANCH}
         git merge refs/remotes/origin/${CURRENT_BRANCH}
-        python update-news-fragment.py -n "$PR_NUMBER" --content "$PR_TITLE" -f "$FRAGMENT"
+        python scripts/update-news-fragment.py -n "$PR_NUMBER" --content "$PR_TITLE" -f "$FRAGMENT"
 
     - name: Get Changed Files
       id: changed-files
