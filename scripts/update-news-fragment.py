@@ -19,6 +19,10 @@ def get_config():
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument(
+        '-n', '--number',
+        help='Enter the number of the news fragment you want to create.'
+    )
+    parser.add_argument(
         '--content', default='',
         help='Enter the contents for the news fragment to modify.'
     )
@@ -49,7 +53,7 @@ def main():
 
     files = [basename for basename in files if len(basename.split(".")) == 3]
     if not files:
-        basename = '.'.join([str(0), args.fragment, 'md'])
+        basename = '.'.join([str(args.number if args.number else 0), args.fragment, 'md'])
         output_path = Path(os.path.join(fragment_dir, basename))
         output_path.write_text(args.content)
         print(f'\n### {args.fragment.title()}\n * {args.content} ({basename})', file=sys.stderr)
