@@ -62,12 +62,18 @@ def main():
 
     for basename in files:
         parts = basename.split(".")
-        if parts[1] != args.fragment:
-            continue
-        output_path = Path(os.path.join(fragment_dir, basename))
+        if parts[1] == args.fragment:   # UPDATE
+            _basename = basename
+            msg = f'Successfully updated the "{parts[1].title()}" news fragment found by towncrier.\n'
+        else:                           # CREATE
+            _basename = '.'.join([str(args.number if args.number else 0), args.fragment, 'md'])
+            msg = f'Successfully created the "{args.fragment.title()}" news fragment found by towncrier.\n'
+        output_path = Path(os.path.join(fragment_dir, _basename))
         output_path.write_text(args.content)
-        print(f'\n### {parts[1].title()}\n * {args.content} ({basename})', file=sys.stderr)
-        print(f'Successfully updated the "{parts[1].title()}" news fragment found by towncrier.\n', file=sys.stderr)
+        print(f'\n### {parts[1].title()}\n * {args.content} ({_basename})', file=sys.stderr)
+        print(msg, file=sys.stderr)
+    sys.exit(0)
+
 
 if __name__ == '__main__':
     main()
