@@ -68,9 +68,12 @@ jobs:
         files: |
           changes/**
 
+    - name: DEBUG
+      run: echo ${{ steps.changed-files.outputs.any_changed }}
+
     - name: Auto commit and push changes
       id: auto-commit-push
-      if: ${{ steps.changed-files.outputs.changes_detected }}
+      if: ${{ steps.changed-files.outputs.any_changed }}
       uses: stefanzweifel/git-auto-commit-action@v4
       with:
         commit_message: update ${{ steps.get-label.outputs.fragment }} news fragment
