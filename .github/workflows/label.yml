@@ -49,14 +49,7 @@ jobs:
         python -m pip install -U pip setuptools
         python -m pip install -U towncrier~=21.9
 
-    - name: Check existence of news fragment
-      env:
-        BASE_BRANCH: ${{ github.base_ref }}
-      run: |
-        git fetch --no-tags origin +refs/heads/${BASE_BRANCH}:refs/remotes/origin/${BASE_BRANCH}
-        python -m towncrier.check --compare-with=origin/${BASE_BRANCH}
-
-    - name: Update existing news fragment
+    - name: Update news fragment
       env:
         CURRENT_BRANCH: ${{ steps.branch-name.outputs.current_branch }}
         PR_TITLE: ${{ steps.get-label.outputs.pr_title }}
@@ -88,3 +81,10 @@ jobs:
         else
           echo "no changes detected"
         fi
+
+    - name: Check existence of news fragment
+      env:
+        BASE_BRANCH: ${{ github.base_ref }}
+      run: |
+        git fetch --no-tags origin +refs/heads/${BASE_BRANCH}:refs/remotes/origin/${BASE_BRANCH}
+        python -m towncrier.check --compare-with=origin/${BASE_BRANCH}
