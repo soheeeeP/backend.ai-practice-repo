@@ -78,6 +78,11 @@ jobs:
     - name: Check existence of news fragment
       env:
         BASE_BRANCH: ${{ github.base_ref }}
+        CURRENT_BRANCH: ${{ steps.branch-name.outputs.current_branch }}
       run: |
+        echo $CURRENT_BRANCH
+        echo ${CURRENT_BRANCH}
+        git fetch --no-tags origin +refs/heads/${CURRENT_BRANCH}:refs/remotes/origin/${CURRENT_BRANCH}
+        git merge refs/remotes/origin/${CURRENT_BRANCH}
         git fetch --no-tags origin +refs/heads/${BASE_BRANCH}:refs/remotes/origin/${BASE_BRANCH}
         python -m towncrier.check --compare-with=origin/${BASE_BRANCH}
