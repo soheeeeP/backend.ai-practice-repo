@@ -30,7 +30,7 @@ jobs:
     - name: Get Label from Title
       id: get-label
       env:
-        PR_TITLE: $ {{ github.event.pull_request.title }}
+        PR_TITLE: ${{ github.event.pull_request.title }}
       run: |    # todo: check if label is explicit
         echo $PR_TITLE
         pr_title=${PR_TITLE##*:}
