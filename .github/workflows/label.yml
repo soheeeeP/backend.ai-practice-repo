@@ -1,0 +1,83 @@
+name: timeline-check
+
+on:
+  pull_request:
+    types: [labeled, unlabeled, opened, synchronize, reopened, edited]
+
+jobs:
+  towncrier:
+    if: ${{ !contains(github.event.pull_request.labels.*.name, 'skip:changelog') }}
+    runs-on: ubuntu-latest
+    steps:
+    - name: Sparse-checkout
+      uses: lablup/sparse-checkout@v1
+      with:
+        patterns: |
+          changes
+          scripts
+          packages
+
+    - name: Get current branch name
+      id: branch-name
+      uses: tj-actions/branch-names@v5.5
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: "3.10"
+        check-latest: true
+
+    - name: Get Label from Title
+      id: get-label
+      env:
+        PR_TITLE: ${{ github.event.pull_request.title }}
+      run: |    # todo: check if label is explicit
+        pr_title=${PR_TITLE##*:}
+        echo "::set-output name=pr_title::$pr_title"
+        fragment=${PR_TITLE%:*}
+        echo "::set-output name=fragment::$fragment"
+
+    - name: Set Label
+      uses: christianvuerings/add-labels@v1
+      with:
+        labels: ${{ steps.get-label.outputs.fragment }}
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Install dependencies
+      run: |
+        python -m pip install -U pip setuptools
+        python -m pip install -U towncrier~=21.9
+
+    - name: Update news fragment
+      env:
+        CURRENT_BRANCH: ${{ steps.branch-name.outputs.current_branch }}
+        PR_NUMBER: ${{ github.event.pull_request.number }}
+        PR_TITLE: ${{ steps.get-label.outputs.pr_title }}
+        FRAGMENT: ${{ steps.get-label.outputs.fragment }}
+      working-directory: .
+      run: |
+        git fetch --no-tags origin +refs/heads/${CURRENT_BRANCH}:refs/remotes/origin/${CURRENT_BRANCH}
+        git merge refs/remotes/origin/${CURRENT_BRANCH}
+        python scripts/update-news-fragment.py -n "$PR_NUMBER" --content "$PR_TITLE" -f "$FRAGMENT"
+
+    - name: Get Changed Files
+      id: changed-files
+      uses: tj-actions/changed-files@v31
+      with:
+        files: |
+          changes/**
+
+    - name: Auto commit and push changes
+      id: auto-commit-push
+      if: ${{ steps.changed-files.outputs.any_changed }}
+      uses: stefanzweifel/git-auto-commit-action@v4
+      with:
+        commit_message: update ${{ steps.get-label.outputs.fragment }} news fragment
+
+    - name: Check existence of news fragment
+      env:
+        BASE_BRANCH: ${{ github.base_ref }}
+      run: |
+        git fetch --no-tags origin +refs/heads/${BASE_BRANCH}:refs/remotes/origin/${BASE_BRANCH}
+        python -m towncrier.check --compare-with=origin/${BASE_BRANCH}
