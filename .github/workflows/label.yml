@@ -32,9 +32,12 @@ jobs:
       env:
         PR_TITLE: $ {{ github.event.pull_request.title }}
       run: |    # todo: check if label is explicit
+        echo $PR_TITLE
         pr_title=${PR_TITLE##*:}
+        echo $pr_title
         echo "::set-output name=pr_title::$pr_title"
         fragment=${PR_TITLE%:*}
+        echo $fragment
         echo "::set-output name=fragment::$fragment"
 
     - name: Set Label
